@@ -1,106 +1,79 @@
-import { useNavigation, useSelect } from "@refinedev/core";
-import { useForm } from "@refinedev/react-hook-form";
+import { Create, useForm, useSelect } from "@refinedev/antd";
+import MDEditor from "@uiw/react-md-editor";
+import { Form, Input, Select } from "antd";
+import { CATEGORIES_SELECT_QUERY, POST_CREATE_MUTATION } from "./queries";
 
 export const BlogPostCreate = () => {
-  const { list } = useNavigation();
+  const { formProps, saveButtonProps } = useForm({
+    meta: {
+      gqlMutation: POST_CREATE_MUTATION,
+    },
+  });
 
-  const {
-    refineCore: { onFinish },
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({});
-
-  const { options: categoryOptions } = useSelect({
+  const { selectProps: categorySelectProps } = useSelect({
     resource: "categories",
+    meta: {
+      gqlQuery: CATEGORIES_SELECT_QUERY,
+    },
   });
 
   return (
-    <div style={{ padding: "16px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Create</h1>
-        <div>
-          <button
-            onClick={() => {
-              list("blog_posts");
-            }}
-          >
-            List
-          </button>
-        </div>
-      </div>
-      <form onSubmit={handleSubmit(onFinish)}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
+    <Create saveButtonProps={saveButtonProps}>
+      <Form {...formProps} layout="vertical">
+        <Form.Item
+          label={"Title"}
+          name={["title"]}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
         >
-          <label>
-            <span style={{ marginRight: "8px" }}>title</span>
-            <input
-              type="text"
-              {...register("title", {
-                required: "This field is required",
-              })}
-            />
-            <span style={{ color: "red" }}>
-              {(errors as any)?.title?.message as string}
-            </span>
-          </label>
-          <label>
-            <span style={{ marginRight: "8px" }}>Content</span>
-            <textarea
-              rows={5}
-              cols={33}
-              style={{ verticalAlign: "top" }}
-              {...register("content", {
-                required: "This field is required",
-              })}
-            />
-            <span style={{ color: "red" }}>
-              {(errors as any)?.content?.message as string}
-            </span>
-          </label>
-          <label>
-            <span style={{ marginRight: "8px" }}>Category</span>
-            <select
-              {...register("category.id", {
-                required: "This field is required",
-              })}
-            >
-              {categoryOptions?.map((option) => (
-                <option value={option.value} key={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <span style={{ color: "red" }}>
-              {(errors as any)?.category?.id?.message as string}
-            </span>
-          </label>
-          <label>
-            <span style={{ marginRight: "8px" }}>Status</span>
-            <select
-              defaultValue={"draft"}
-              {...register("status", {
-                required: "This field is required",
-              })}
-            >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <span style={{ color: "red" }}>
-              {(errors as any)?.status?.message as string}
-            </span>
-          </label>
-          <div>
-            <input type="submit" value="save" />
-          </div>
-        </div>
-      </form>
-    </div>
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label={"Content"}
+          name="content"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <MDEditor data-color-mode="light" />
+        </Form.Item>
+        <Form.Item
+          label={"Category"}
+          name={"categoryId"}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Select {...categorySelectProps} />
+        </Form.Item>
+        <Form.Item
+          label={"Status"}
+          name={["status"]}
+          initialValue={"DRAFT"}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Select
+            defaultValue={"DRAFT"}
+            options={[
+              { value: "DRAFT", label: "Draft" },
+              { value: "PUBLISHED", label: "Published" },
+              { value: "REJECTED", label: "Rejected" },
+            ]}
+            style={{ width: 120 }}
+          />
+        </Form.Item>
+      </Form>
+    </Create>
   );
 };

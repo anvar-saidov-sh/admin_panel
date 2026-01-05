@@ -1,35 +1,24 @@
-import { useNavigation, useResourceParams, useShow } from "@refinedev/core";
+import { Show, TextField } from "@refinedev/antd";
+import { useShow } from "@refinedev/core";
+import { Typography } from "antd";
+import { CATEGORY_SHOW_QUERY } from "./queries";
+
+const { Title } = Typography;
 
 export const CategoryShow = () => {
-  const { edit, list } = useNavigation();
-  const { id } = useResourceParams();
-  const { result: record } = useShow({});
+  const { result: record, query } = useShow({
+    meta: {
+      gqlQuery: CATEGORY_SHOW_QUERY,
+    },
+  });
+  const { isLoading } = query;
 
   return (
-    <div style={{ padding: "16px" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <h1>Show</h1>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button onClick={() => list("categories")}>List</button>
-          <button onClick={() => edit("categories", id ?? "")}>Edit</button>
-        </div>
-      </div>
-      <div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>ID</h5>
-          <div>{record?.id ?? ""}</div>
-        </div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>Title</h5>
-          <div>{record?.title}</div>
-        </div>
-      </div>
-    </div>
+    <Show isLoading={isLoading}>
+      <Title level={5}>{"ID"}</Title>
+      <TextField value={record?.id} />
+      <Title level={5}>{"Title"}</Title>
+      <TextField value={record?.title} />
+    </Show>
   );
 };

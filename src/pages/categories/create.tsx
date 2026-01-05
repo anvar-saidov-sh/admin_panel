@@ -1,55 +1,29 @@
-import { useNavigation } from "@refinedev/core";
-import { useForm } from "@refinedev/react-hook-form";
+import { Create, useForm } from "@refinedev/antd";
+import { Form, Input } from "antd";
+import { CATEGORY_CREATE_MUTATION } from "./queries";
 
 export const CategoryCreate = () => {
-  const { list } = useNavigation();
-
-  const {
-    refineCore: { onFinish },
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({});
+  const { formProps, saveButtonProps } = useForm({
+    meta: {
+      gqlMutation: CATEGORY_CREATE_MUTATION,
+    },
+  });
 
   return (
-    <div style={{ padding: "16px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h1>Create</h1>
-        <div>
-          <button
-            onClick={() => {
-              list("categories");
-            }}
-          >
-            List
-          </button>
-        </div>
-      </div>
-      <form onSubmit={handleSubmit(onFinish)}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
+    <Create saveButtonProps={saveButtonProps}>
+      <Form {...formProps} layout="vertical">
+        <Form.Item
+          label={"Title"}
+          name={["title"]}
+          rules={[
+            {
+              required: true,
+            },
+          ]}
         >
-          <label>
-            <span style={{ marginRight: "8px" }}>Title</span>
-            <input
-              type="text"
-              {...register("title", {
-                required: "This field is required",
-              })}
-            />
-            <span style={{ color: "red" }}>
-              {(errors as any)?.title?.message as string}
-            </span>
-          </label>
-          <div>
-            <input type="submit" value={"Save"} />
-          </div>
-        </div>
-      </form>
-    </div>
+          <Input />
+        </Form.Item>
+      </Form>
+    </Create>
   );
 };

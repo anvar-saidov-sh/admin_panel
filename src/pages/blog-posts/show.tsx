@@ -1,75 +1,34 @@
-import {
-  useNavigation,
-  useOne,
-  useResourceParams,
-  useShow,
-} from "@refinedev/core";
+import { DateField, MarkdownField, Show, TextField } from "@refinedev/antd";
+import { useShow } from "@refinedev/core";
+import { Typography } from "antd";
+import { POST_SHOW_QUERY } from "./queries";
+
+const { Title } = Typography;
 
 export const BlogPostShow = () => {
-  const { edit, list } = useNavigation();
-  const { id } = useResourceParams();
-  const { result: record, query } = useShow({});
-
   const {
-    result: category,
-    query: { isLoading: categoryIsLoading },
-  } = useOne({
-    resource: "categories",
-    id: record?.category?.id || "",
-    queryOptions: {
-      enabled: !!record,
+    result: record,
+    query: { isLoading },
+  } = useShow({
+    meta: {
+      gqlQuery: POST_SHOW_QUERY,
     },
   });
 
   return (
-    <div style={{ padding: "16px" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <h1>{"Show"}</h1>
-        <div style={{ display: "flex", gap: "8px" }}>
-          <button onClick={() => list("blog_posts")}>{"List"}</button>
-          <button onClick={() => edit("blog_posts", id ?? "")}>{"Edit"}</button>
-        </div>
-      </div>
-      <div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>{"ID"}</h5>
-          <div>{record?.id ?? ""}</div>
-        </div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>{"Title"}</h5>
-          <div>{record?.title}</div>
-        </div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>{"Content"}</h5>
-          <p>{record?.content}</p>
-        </div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>{"Category"}</h5>
-          <div>
-            {categoryIsLoading ? <>Loading...</> : <>{category?.title}</>}
-          </div>
-        </div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>{"Status"}</h5>
-          <div>{record?.status}</div>
-        </div>
-        <div style={{ marginTop: "6px" }}>
-          <h5>{"Created at"}</h5>
-          <div>
-            {record?.createdAt
-              ? new Date(record?.createdAt).toLocaleString(undefined, {
-                  timeZone: "UTC",
-                })
-              : "-"}
-          </div>
-        </div>
-      </div>
-    </div>
+    <Show isLoading={isLoading}>
+      <Title level={5}>{"ID"}</Title>
+      <TextField value={record?.id} />
+      <Title level={5}>{"Title"}</Title>
+      <TextField value={record?.title} />
+      <Title level={5}>{"Content"}</Title>
+      <MarkdownField value={record?.content} />
+      <Title level={5}>{"Category"}</Title>
+      <TextField value={record?.category?.title} />
+      <Title level={5}>{"Status"}</Title>
+      <TextField value={record?.status} />
+      <Title level={5}>{"CreatedAt"}</Title>
+      <DateField value={record?.createdAt} />
+    </Show>
   );
 };
